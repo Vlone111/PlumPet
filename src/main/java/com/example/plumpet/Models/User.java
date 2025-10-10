@@ -2,12 +2,13 @@ package com.example.plumpet.Models;
 
 import com.example.plumpet.Models.Role;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+
 
 @Entity
 @Getter
@@ -21,6 +22,9 @@ public class User {
 
     @Column(name = "username", nullable = false)
     private String username;
+
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
