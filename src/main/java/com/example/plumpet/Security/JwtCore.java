@@ -24,4 +24,7 @@ public class JwtCore {
                 .signWith(SignatureAlgorithm.HS256,secret)
                 .compact();
     }
+    public String getnamefromJwt(String token) {
+        return Jwts.parser().setSigningKey(secret).build().parseClaimsJws(token).getBody().getSubject();
+    }
 }
