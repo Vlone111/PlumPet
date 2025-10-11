@@ -33,11 +33,11 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @Column(name = "time_registrated", nullable = false)
-    private LocalDateTime createdAt;
+    //@Column(name = "time_registrated", nullable = false)
+    //private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    //@PrePersist
+    //protected void onCreate() {
+    //    this.createdAt = LocalDateTime.now();
+    //}
 }

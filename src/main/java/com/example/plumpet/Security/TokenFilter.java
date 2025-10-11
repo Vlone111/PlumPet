@@ -45,12 +45,13 @@ public class TokenFilter extends OncePerRequestFilter {
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     userDetails = userDetailsService.loadUserByUsername(username);
                     auth = new UsernamePasswordAuthenticationToken(
-                            userDetails,null);
+                            userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
         }
         catch (Exception e){
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
             //to do мб иссяк токен
         }
         filterChain.doFilter(request, response);

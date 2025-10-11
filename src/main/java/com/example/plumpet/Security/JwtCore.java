@@ -11,10 +11,10 @@ import java.util.Date;
 
 @Component
 public class JwtCore {
-    @Value("$Plumpet.app.secret")
+    @Value("${Plumpet.app.secret}")
     private String secret;
 
-    @Value("$Plumpet.app.expirationMs")
+    @Value("${Plumpet.app.expirationMs}")
     private int lifetime;
 
     public String generateToken(Authentication authentication) {

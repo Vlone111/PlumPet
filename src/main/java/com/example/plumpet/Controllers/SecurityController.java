@@ -2,6 +2,7 @@ package com.example.plumpet.Controllers;
 
 import com.example.plumpet.Dto.SigninRequest;
 import com.example.plumpet.Dto.SignupRequest;
+import com.example.plumpet.Models.Role;
 import com.example.plumpet.Models.User;
 import com.example.plumpet.Repository.UserRepository;
 import com.example.plumpet.Security.JwtCore;
@@ -44,12 +45,13 @@ public class SecurityController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest) {
         if (userRepository.existsUserByUsername(signupRequest.getUsername())||userRepository.existsUserByEmail(signupRequest.getEmail())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok("IDI NAHUI");
         };
         User user = new  User();
         user.setUsername(signupRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         user.setEmail(signupRequest.getEmail());
+        user.setRole(Role.User);
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
