@@ -1,6 +1,5 @@
 package com.example.plumpet.Security;
 
-import com.example.plumpet.Service.AdminService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,40 +19,42 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class TokenFilter extends OncePerRequestFilter {
     private final JwtCore jwtCore;
-    private final AdminService adminService;
     private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String jwt = null;
-        String username = null;
-        UserDetails userDetails = null;
-        UsernamePasswordAuthenticationToken auth = null;
-
-        try{
+        try {
             String authorization = request.getHeader("Authorization");
+            
+            // Only process if Authorization header is present and starts with "Bearer "
             if (authorization != null && authorization.startsWith("Bearer ")) {
-                jwt = authorization.substring(7);
+                String jwt = authorization.substring(7);
+                
+                if (jwt != null && !jwt.trim().isEmpty()) {
+                    try {
+                        String username = jwtCore.getnamefromJwt(jwt);
+                        
+                        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities());
+                            SecurityContextHolder.getContext().setAuthentication(auth);
+                        }
+                    } catch (ExpiredJwtException e) {
+                        // Token expired - just log and continue without authentication
+                        System.err.println("JWT token expired: " + e.getMessage());
+                    } catch (Exception e) {
+                        // Invalid token - just log and continue without authentication
+                        System.err.println("Invalid JWT token: " + e.getMessage());
+                    }
+                }
             }
-            if (jwt != null) {
-                try {
-                    username = jwtCore.getnamefromJwt(jwt);
-                }
-                catch (ExpiredJwtException e) {
-                    // to do
-                }
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    userDetails = userDetailsService.loadUserByUsername(username);
-                    auth = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            }
+        } catch (Exception e) {
+            // Log the exception for debugging but don't block the request
+            System.err.println("JWT processing error: " + e.getMessage());
         }
-        catch (Exception e){
-            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            //to do мб иссяк токен
-        }
+        
+        // Always continue the filter chain
         filterChain.doFilter(request, response);
     }
 }

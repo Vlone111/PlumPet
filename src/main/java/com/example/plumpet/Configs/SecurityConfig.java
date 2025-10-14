@@ -1,14 +1,12 @@
 package com.example.plumpet.Configs;
 
 import com.example.plumpet.Security.TokenFilter;
-import com.example.plumpet.Service.AdminService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,7 +23,6 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final AdminService adminService; //никакого понимания
     private final TokenFilter tokenFilter;
 
     @Bean
@@ -44,8 +41,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/public/**").permitAll()
                         .requestMatchers("/admin/**").fullyAuthenticated()
-                        .anyRequest().permitAll() //изменить
+                        .anyRequest().permitAll()
 
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -62,11 +60,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
 
-    }
-    @Bean
-    public AuthenticationManagerBuilder configureAuthenticationManagerBuilder(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(adminService).passwordEncoder(encoder());
-        return authenticationManagerBuilder;
     }
 
 }
